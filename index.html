@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五十音</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            width: 1100px;
+            margin: 0 auto;
+        }
+
+        .syllabary-section {
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .syllabary-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        .youon-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .syllable-cell {
+            border-radius: 8px;
+            padding: 6px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            background-color: white;
+        }
+
+        .syllable-cell.empty {
+            background-color: transparent; /* 空单元格不显示背景色 */
+            box-shadow: 0 0 0;
+        }
+
+        .hiragana {
+            font-size: 18px;
+            color: #333;
+            margin-right: 5px;
+        }
+
+        .katakana {
+            font-size: 18px;
+            color: #666;
+        }
+
+        .romaji {
+            font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .section-title {
+            background-color: #4a90e2;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .combined-grid {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .syllabary-block {
+            flex: 1;
+            max-width: 350px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="syllabary-section">
+            <h2 class="section-title">五十音 (Syllabary)</h2>
+            <div class="combined-grid">
+                <div class="syllabary-block">
+                    <h3>清音 (Seion - Basic Syllables)</h3>
+                    <div class="syllabary-grid" id="seion-grid"></div>
+                </div>
+                <div class="syllabary-block">
+                    <h3>浊音 (Dakuon - Voiced Syllables)</h3>
+                    <div class="syllabary-grid" id="dakuon-grid"></div>
+                </div>
+                <div class="syllabary-block">
+                    <h3>拗音 (Yōon - Contracted Sounds)</h3>
+                    <div class="syllabary-grid youon-grid" id="youon-grid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 清音数据
+        const seionData = [
+            { hiragana: 'あ', katakana: 'ア', romaji: 'a' },
+            { hiragana: 'い', katakana: 'イ', romaji: 'i' },
+            { hiragana: 'う', katakana: 'ウ', romaji: 'u' },
+            { hiragana: 'え', katakana: 'エ', romaji: 'e' },
+            { hiragana: 'お', katakana: 'オ', romaji: 'o' },
+            { hiragana: 'か', katakana: 'カ', romaji: 'ka' },
+            { hiragana: 'き', katakana: 'キ', romaji: 'ki' },
+            { hiragana: 'く', katakana: 'ク', romaji: 'ku' },
+            { hiragana: 'け', katakana: 'ケ', romaji: 'ke' },
+            { hiragana: 'こ', katakana: 'コ', romaji: 'ko' },
+            { hiragana: 'さ', katakana: 'サ', romaji: 'sa' },
+            { hiragana: 'し', katakana: 'シ', romaji: 'shi' },
+            { hiragana: 'す', katakana: 'ス', romaji: 'su' },
+            { hiragana: 'せ', katakana: 'セ', romaji: 'se' },
+            { hiragana: 'そ', katakana: 'ソ', romaji: 'so' },
+            { hiragana: 'た', katakana: 'タ', romaji: 'ta' },
+            { hiragana: 'ち', katakana: 'チ', romaji: 'chi' },
+            { hiragana: 'つ', katakana: 'ツ', romaji: 'tsu' },
+            { hiragana: 'て', katakana: 'テ', romaji: 'te' },
+            { hiragana: 'と', katakana: 'ト', romaji: 'to' },
+            { hiragana: 'な', katakana: 'ナ', romaji: 'na' },
+            { hiragana: 'に', katakana: 'ニ', romaji: 'ni' },
+            { hiragana: 'ぬ', katakana: 'ヌ', romaji: 'nu' },
+            { hiragana: 'ね', katakana: 'ネ', romaji: 'ne' },
+            { hiragana: 'の', katakana: 'ノ', romaji: 'no' },
+            { hiragana: 'は', katakana: 'ハ', romaji: 'ha' },
+            { hiragana: 'ひ', katakana: 'ヒ', romaji: 'hi' },
+            { hiragana: 'ふ', katakana: 'フ', romaji: 'fu' },
+            { hiragana: 'へ', katakana: 'ヘ', romaji: 'he' },
+            { hiragana: 'ほ', katakana: 'ホ', romaji: 'ho' },
+            { hiragana: 'ま', katakana: 'マ', romaji: 'ma' },
+            { hiragana: 'み', katakana: 'ミ', romaji: 'mi' },
+            { hiragana: 'む', katakana: 'ム', romaji: 'mu' },
+            { hiragana: 'め', katakana: 'メ', romaji: 'me' },
+            { hiragana: 'も', katakana: 'モ', romaji: 'mo' },
+            { hiragana: 'や', katakana: 'ヤ', romaji: 'ya' },
+            { hiragana: '', katakana: '', romaji: '' }, // 空数据
+            { hiragana: 'ゆ', katakana: 'ユ', romaji: 'yu' },
+            { hiragana: '', katakana: '', romaji: '' }, // 空数据
+            { hiragana: 'よ', katakana: 'ヨ', romaji: 'yo' },
+            { hiragana: 'ら', katakana: 'ラ', romaji: 'ra' },
+            { hiragana: 'り', katakana: 'リ', romaji: 'ri' },
+            { hiragana: 'る', katakana: 'ル', romaji: 'ru' },
+            { hiragana: 'れ', katakana: 'レ', romaji: 're' },
+            { hiragana: 'ろ', katakana: 'ロ', romaji: 'ro' },
+            { hiragana: 'わ', katakana: 'ワ', romaji: 'wa' },
+            { hiragana: '', katakana: '', romaji: '' }, // 空数据
+            { hiragana: '', katakana: '', romaji: '' }, // 空数据
+            { hiragana: '', katakana: '', romaji: '' }, // 空数据
+            { hiragana: 'を', katakana: 'ヲ', romaji: 'wo' },
+            { hiragana: 'ん', katakana: 'ン', romaji: 'n' },
+        ];
+
+        // 浊音和半浊音数据
+        const dakuonData = [
+            { hiragana: 'が', katakana: 'ガ', romaji: 'ga' },
+            { hiragana: 'ぎ', katakana: 'ギ', romaji: 'gi' },
+            { hiragana: 'ぐ', katakana: 'グ', romaji: 'gu' },
+            { hiragana: 'げ', katakana: 'ゲ', romaji: 'ge' },
+            { hiragana: 'ご', katakana: 'ゴ', romaji: 'go' },
+            { hiragana: 'ざ', katakana: 'ザ', romaji: 'za' },
+            { hiragana: 'じ', katakana: 'ジ', romaji: 'ji' },
+            { hiragana: 'ず', katakana: 'ズ', romaji: 'zu' },
+            { hiragana: 'ぜ', katakana: 'ゼ', romaji: 'ze' },
+            { hiragana: 'ぞ', katakana: 'ゾ', romaji: 'zo' },
+            { hiragana: 'だ', katakana: 'ダ', romaji: 'da' },
+            { hiragana: 'ぢ', katakana: 'ヂ', romaji: 'ji' },
+            { hiragana: 'づ', katakana: 'ヅ', romaji: 'zu' },
+            { hiragana: 'で', katakana: 'デ', romaji: 'de' },
+            { hiragana: 'ど', katakana: 'ド', romaji: 'do' },
+            { hiragana: 'ば', katakana: 'バ', romaji: 'ba' },
+            { hiragana: 'び', katakana: 'ビ', romaji: 'bi' },
+            { hiragana: 'ぶ', katakana: 'ブ', romaji: 'bu' },
+            { hiragana: 'べ', katakana: 'ベ', romaji: 'be' },
+            { hiragana: 'ぼ', katakana: 'ボ', romaji: 'bo' },
+            // 以下是半浊音数据
+            { hiragana: 'ぱ', katakana: 'パ', romaji: 'pa' },
+            { hiragana: 'ぴ', katakana: 'ピ', romaji: 'pi' },
+            { hiragana: 'ぷ', katakana: 'プ', romaji: 'pu' },
+            { hiragana: 'ぺ', katakana: 'ペ', romaji: 'pe' },
+            { hiragana: 'ぽ', katakana: 'ポ', romaji: 'po' }
+        ];
+
+        // 拗音数据
+        const youonData = [
+            // 清音拗音
+            { hiragana: 'きゃ', katakana: 'キャ', romaji: 'kya' },
+            { hiragana: 'きゅ', katakana: 'キュ', romaji: 'kyu' },
+            { hiragana: 'きょ', katakana: 'キョ', romaji: 'kyo' },
+            { hiragana: 'しゃ', katakana: 'シャ', romaji: 'sha' },
+            { hiragana: 'しゅ', katakana: 'シュ', romaji: 'shu' },
+            { hiragana: 'しょ', katakana: 'ショ', romaji: 'sho' },
+            { hiragana: 'ちゃ', katakana: 'チャ', romaji: 'cha' },
+            { hiragana: 'ちゅ', katakana: 'チュ', romaji: 'chu' },
+            { hiragana: 'ちょ', katakana: 'チョ', romaji: 'cho' },
+            { hiragana: 'にゃ', katakana: 'ニャ', romaji: 'nya' },
+            { hiragana: 'にゅ', katakana: 'ニュ', romaji: 'nyu' },
+            { hiragana: 'にょ', katakana: 'ニョ', romaji: 'nyo' },
+            { hiragana: 'ひゃ', katakana: 'ヒャ', romaji: 'hya' },
+            { hiragana: 'ひゅ', katakana: 'ヒュ', romaji: 'hyu' },
+            { hiragana: 'ひょ', katakana: 'ヒョ', romaji: 'hyo' },
+            { hiragana: 'みゃ', katakana: 'ミャ', romaji: 'mya' },
+            { hiragana: 'みゅ', katakana: 'ミュ', romaji: 'myu' },
+            { hiragana: 'みょ', katakana: 'ミョ', romaji: 'myo' },
+            { hiragana: 'りゃ', katakana: 'リャ', romaji: 'rya' },
+            { hiragana: 'りゅ', katakana: 'リュ', romaji: 'ryu' },
+            { hiragana: 'りょ', katakana: 'リョ', romaji: 'ryo' },
+            // 浊音拗音
+            { hiragana: 'ぎゃ', katakana: 'ギャ', romaji: 'gya' },
+            { hiragana: 'ぎゅ', katakana: 'ギュ', romaji: 'gyu' },
+            { hiragana: 'ぎょ', katakana: 'ギョ', romaji: 'gyo' },
+            { hiragana: 'じゃ', katakana: 'ジャ', romaji: 'ja' },
+            { hiragana: 'じゅ', katakana: 'ジュ', romaji: 'ju' },
+            { hiragana: 'じょ', katakana: 'ジョ', romaji: 'jo' },
+            { hiragana: 'びゃ', katakana: 'ビャ', romaji: 'bya' },
+            { hiragana: 'びゅ', katakana: 'ビュ', romaji: 'byu' },
+            { hiragana: 'びょ', katakana: 'ビョ', romaji: 'byo' },
+            { hiragana: 'ぢゃ', katakana: 'ヂャ', romaji: 'ja' },
+            { hiragana: 'ぢゅ', katakana: 'ヂュ', romaji: 'ju' },
+            { hiragana: 'ぢょ', katakana: 'ヂョ', romaji: 'jo' },
+            // 半浊音拗音
+            { hiragana: 'ぴゃ', katakana: 'ピャ', romaji: 'pya' },
+            { hiragana: 'ぴゅ', katakana: 'ピュ', romaji: 'pyu' },
+            { hiragana: 'ぴょ', katakana: 'ピョ', romaji: 'pyo' }
+        ];
+
+        // 动态生成五十音表
+        function generateSyllabary(data, gridId) {
+            const grid = document.getElementById(gridId);
+            data.forEach(item => {
+                const cell = document.createElement('div');
+                cell.className = 'syllable-cell' + (item.hiragana === '' ? ' empty' : ''); // 添加空类
+                cell.innerHTML = `
+                    <div>
+                        <div class="hiragana">${item.hiragana}</div>
+                        <div class="romaji">${item.romaji}</div>
+                    </div>
+                    <div class="katakana">${item.katakana}</div>
+                `;
+                grid.appendChild(cell);
+            });
+        }
+
+        // 生成清音、浊音和拗音
+        generateSyllabary(seionData, 'seion-grid');
+        generateSyllabary(dakuonData, 'dakuon-grid');
+        generateSyllabary(youonData, 'youon-grid');
+    </script>
+</body>
+</html>

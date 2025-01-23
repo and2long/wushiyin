@@ -13,8 +13,9 @@
         }
 
         .container {
-            width: 1100px;
+            max-width: 1100px;
             margin: 0 auto;
+            padding: 0 20px;
         }
 
         .syllabary-section {
@@ -77,6 +78,22 @@
             padding: 10px;
             border-radius: 4px;
             margin-bottom: 20px;
+            width: 1080px;
+        }
+
+        @media (max-width: 1100px) {
+            .combined-grid {
+                flex-direction: column;
+            }
+            
+            .syllabary-block {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .section-title {
+                width: 330px;
+            }
         }
 
         .combined-grid {
